@@ -13,19 +13,58 @@ import com.rapidcare.repository.EmergencyRequestRepository;
 @Service
 public class EmergencyService {
 
+    private final EmergencyRequestRepository repository;
+
     @Autowired
-    private EmergencyRequestRepository repository;
+    public EmergencyService(EmergencyRequestRepository repository) {
+        this.repository = repository;
+    }
 
     public EmergencyRequest create(EmergencyRequest request) {
-        request.setStatus(RequestStatus.PENDING.name());
         return repository.save(request);
+    }
+
+    public List<EmergencyRequest> getAll() {
+        return repository.findAll();
     }
 
     public Optional<EmergencyRequest> getById(String id) {
         return repository.findById(id);
     }
 
-    public List<EmergencyRequest> getAll() {
-        return repository.findAll();
+    public List<EmergencyRequest> getByHospitalId(String hospitalId) {
+        return repository.findByHospitalId(hospitalId);
     }
+    public EmergencyRequest accept(String id) {
+    EmergencyRequest req = repository.findById(id).orElseThrow();
+    req.setStatus(RequestStatus.ACCEPTED.name());
+    return repository.save(req);
+}
+
+public EmergencyRequest reject(String id) {
+    EmergencyRequest req = repository.findById(id).orElseThrow();
+    req.setStatus(RequestStatus.REJECTED.name());
+    return repository.save(req);
+}
+public List<EmergencyRequest> getByHospital(String hospitalId) {
+    return repository.findByHospitalId(hospitalId);
+}
+public EmergencyRequest inTransit(String id) {
+    EmergencyRequest req = repository.findById(id).orElseThrow();
+    req.setStatus(RequestStatus.IN_TRANSIT.name());
+    return repository.save(req);
+}
+public EmergencyRequest refer(String requestId, String newHospitalId) {
+    EmergencyRequest req = repository.findById(requestId).orElseThrow();
+    req.setHospitalId(newHospitalId);
+    req.setStatus(RequestStatus.PENDING.name());
+    return repository.save(req);
+}
+
+public EmergencyRequest admit(String id) {
+    EmergencyRequest req = repository.findById(id).orElseThrow();
+    req.setStatus(RequestStatus.ADMITTED.name());
+    return repository.save(req);
+}
+
 }
