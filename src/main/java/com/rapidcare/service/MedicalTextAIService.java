@@ -20,7 +20,7 @@ public class MedicalTextAIService {
     @Autowired
     private TextAnalyticsClient client;
 
-    public Map<String, Object> analyzeMedicalText(String text) {
+    public Map<String, Object> analyzeSymptoms(String text) {
 
         AnalyzeHealthcareEntitiesResultCollection results =
                 client.beginAnalyzeHealthcareEntities(
@@ -31,36 +31,46 @@ public class MedicalTextAIService {
                  .iterator()
                  .next();
 
-        List<String> symptoms = new ArrayList<>();
         String severity = "LOW";
+        List<String> reasons = new ArrayList<>();
+        List<String> detectedEntities = new ArrayList<>();
 
         for (AnalyzeHealthcareEntitiesResult doc : results) {
             if (doc.isError()) continue;
 
             for (HealthcareEntity entity : doc.getEntities()) {
 
-                if ("SymptomOrSign".equals(entity.getCategory().toString())) {
-                    symptoms.add(entity.getText());
+                String category = entity.getCategory().toString();
+                String value = entity.getText().toLowerCase();
 
-                    String value = entity.getText().toLowerCase();
+                detectedEntities.add(entity.getText());
 
-                    if (value.contains("chest")
-                            || value.contains("heart")
-                            || value.contains("breathing")
-                            || value.contains("stroke")
-                            || value.contains("unconscious")) {
-                        severity = "HIGH";
-                    } 
-                    else if (!"HIGH".equals(severity)) {
-                        severity = "MEDIUM";
-                    }
+                if (category.equals("DiseaseDisorder")
+                        || value.contains("heart")
+                        || value.contains("stroke")
+                        || value.contains("breathing")
+                        || value.contains("chest")) {
+
+                    severity = "HIGH";
+                    reasons.add("Critical symptom detected: " + entity.getText());
+                }
+                else if (category.equals("SymptomOrSign")
+                        && !"HIGH".equals(severity)) {
+
+                    severity = "MEDIUM";
+                    reasons.add("Medical symptom detected: " + entity.getText());
                 }
             }
         }
 
+        if (reasons.isEmpty()) {
+            reasons.add("No critical medical entities detected by AI");
+        }
+
         Map<String, Object> response = new HashMap<>();
-        response.put("symptoms", symptoms);
         response.put("severity", severity);
+        response.put("reasons", reasons);
+        response.put("entities", detectedEntities);
 
         return response;
     }

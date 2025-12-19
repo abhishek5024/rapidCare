@@ -1,6 +1,7 @@
 package com.rapidcare.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,21 @@ public class EmergencyService {
         this.repository = repository;
     }
 
-    public EmergencyRequest create(EmergencyRequest request) {
-        return repository.save(request);
-    }
+    @Autowired
+private MedicalTextAIService aiService;
+
+public EmergencyRequest create(EmergencyRequest request) {
+
+    Map<String, Object> aiResult =
+            aiService.analyzeSymptoms(request.getSymptoms());
+
+    request.setSeverity((String) aiResult.get("severity"));
+    request.setAiReasons((List<String>) aiResult.get("reasons"));
+    request.setAiEntities((List<String>) aiResult.get("entities"));
+    request.setStatus(RequestStatus.PENDING.name());
+
+    return repository.save(request);
+}
 
     public List<EmergencyRequest> getAll() {
         return repository.findAll();
