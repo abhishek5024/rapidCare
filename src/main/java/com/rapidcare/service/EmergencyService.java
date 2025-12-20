@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.rapidcare.controller.EmergencySseController;
 import com.rapidcare.model.EmergencyRequest;
 import com.rapidcare.model.RequestStatus;
 import com.rapidcare.repository.EmergencyRequestRepository;
@@ -20,6 +21,8 @@ public class EmergencyService {
     public EmergencyService(EmergencyRequestRepository repository) {
         this.repository = repository;
     }
+    @Autowired
+private EmergencySseController sseController;
 
     @Autowired
 private MedicalTextAIService aiService;
@@ -51,13 +54,27 @@ public EmergencyRequest create(EmergencyRequest request) {
     public EmergencyRequest accept(String id) {
     EmergencyRequest req = repository.findById(id).orElseThrow();
     req.setStatus(RequestStatus.ACCEPTED.name());
-    return repository.save(req);
+    req.setHospitalAddress("PMCH, Patna, Bihar");
+
+    EmergencyRequest saved = repository.save(req);
+
+    sseController.notifyStatus(id, saved);
+
+    return saved;
 }
 
 public EmergencyRequest reject(String id) {
     EmergencyRequest req = repository.findById(id).orElseThrow();
+
     req.setStatus(RequestStatus.REJECTED.name());
-    return repository.save(req);
+    req.setRejectionReason("No ICU bed available");
+
+    EmergencyRequest saved = repository.save(req);
+
+    // 🔔 Notify patient live
+    sseController.notifyStatus(id, saved);
+
+    return saved;
 }
 public List<EmergencyRequest> getByHospital(String hospitalId) {
     return repository.findByHospitalId(hospitalId);

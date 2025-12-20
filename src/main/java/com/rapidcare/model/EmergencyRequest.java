@@ -23,5 +23,13 @@ public class EmergencyRequest {
     private Instant createdAt = Instant.now();
     private List<String> aiReasons;
     private List<String> aiEntities;
+    private String hospitalAddress;
+    private String rejectionReason;
+
+
+    // public void setHospitalAddress(String string) {
+    //     // TODO Auto-generated method stub
+    //     throw new UnsupportedOperationException("Unimplemented method 'setHospitalAddress'");
+    // }
 
 }

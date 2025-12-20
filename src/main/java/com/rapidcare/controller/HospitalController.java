@@ -37,4 +37,5 @@ public class HospitalController {
     public Hospital prepareBed(@PathVariable String id) {
         return service.prepareBed(id);
     }
+    
 }
