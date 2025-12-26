@@ -5,12 +5,13 @@ import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.rapidcare.model.EmergencyRequest;
-import com.rapidcare.model.RequestStatus;
 
-public interface EmergencyRequestRepository 
-    extends MongoRepository<EmergencyRequest, String> {
-        List<EmergencyRequest> findByHospitalId(String hospitalId);
-        // List<EmergencyRequest> findByHospitalId(String hospitalId);
-        List<EmergencyRequest> findByStatus(RequestStatus status);
+public interface EmergencyRequestRepository
+        extends MongoRepository<EmergencyRequest, String> {
 
+    // Accepted by a specific hospital
+    List<EmergencyRequest> findByAcceptedHospitalId(String hospitalId);
+
+    // All requests with a given status (PENDING / ACCEPTED / etc.)
+    List<EmergencyRequest> findByStatus(String status);
 }

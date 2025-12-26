@@ -1,0 +1,253 @@
+/* Patient Home (Emergency-friendly UX) */
+
+.patient-home {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: #0b1220;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+
+.patient-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: rgba(17, 24, 39, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.patient-topbar-title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.patient-topbar-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.patient-topbar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.patient-topbar-text {
+  font-size: 13px;
+  font-weight: 700;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-topbar-logout {
+  border: none;
+  cursor: pointer;
+  background: #ef4444;
+  color: #ffffff;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.patient-topbar-logout:hover {
+  filter: brightness(1.05);
+}
+
+.patient-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.patient-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.patient-home-main {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 22px 16px 30px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.patient-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.patient-action-card {
+  width: 100%;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  padding: 18px;
+  border-radius: 18px;
+  color: #ffffff;
+  min-height: 140px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.32);
+}
+
+.patient-action-card:active {
+  transform: translateY(1px);
+}
+
+.patient-action-title {
+  font-size: 18px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.patient-action-subtitle {
+  font-size: 13px;
+  opacity: 0.9;
+  line-height: 1.35;
+}
+
+.action-red {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+
+.action-blue {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.action-green {
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+}
+
+.patient-status-panel {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.patient-status-title {
+  font-weight: 900;
+  font-size: 14px;
+  opacity: 0.95;
+  margin-bottom: 10px;
+}
+
+.patient-status-value {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.patient-status-muted {
+  margin-top: 10px;
+  font-size: 12px;
+  opacity: 0.85;
+  line-height: 1.35;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .patient-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-topbar-item {
+    display: none;
+  }
+}
+
+.home-container {
+  min-height: 100vh;
+  padding: 30px;
+  background: #f5f7fb;
+  font-family: Arial, sans-serif;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.logout-btn {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.card-container {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-card {
+  width: 300px;
+  padding: 25px;
+  border-radius: 12px;
+  cursor: pointer;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-6px);
+}
+
+.action-card h3 {
+  margin-bottom: 10px;
+}
+
+.action-card p {
+  color: #555;
+  font-size: 14px;
+}
+
+.action-card.emergency {
+  border-left: 6px solid red;
+}
+
+.action-card.hospital {
+  border-left: 6px solid #1677ff;
+}
+
+.topbar-logo-btn {
+  width: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.topbar-logo-btn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.8);
+  outline-offset: 4px;
+  border-radius: 12px;
+}

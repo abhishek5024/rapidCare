@@ -1,0 +1,307 @@
+/* ER-friendly Hospital Dashboard (dark-on-light, minimal clutter) */
+
+.hosp-page {
+  min-height: 100vh;
+  background: #f3f6fb;
+  color: #0f172a;
+  font-family: Arial, sans-serif;
+}
+
+.hosp-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hosp-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hosp-brand {
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.hosp-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hosp-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hosp-logout {
+  width: auto;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 900;
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.hosp-logout:hover {
+  filter: brightness(1.05);
+}
+
+.hosp-container {
+  padding: 18px 16px 28px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hosp-panels {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.hosp-panel {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.hosp-panel-title {
+  font-size: 12px;
+  opacity: 0.75;
+  font-weight: 800;
+}
+
+.hosp-panel-value {
+  font-size: 22px;
+  font-weight: 900;
+  margin-top: 6px;
+}
+
+.hosp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.hosp-section {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.hosp-section-title {
+  font-weight: 900;
+  margin: 0 0 10px;
+}
+
+.req-card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #ffffff;
+}
+
+.req-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.req-patient {
+  font-weight: 900;
+}
+
+.req-meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sev-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.sev-red {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.sev-orange {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.sev-green {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.req-time {
+  font-size: 12px;
+  opacity: 0.7;
+  font-weight: 700;
+}
+
+.req-symptoms {
+  margin-top: 8px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.req-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.req-btn {
+  width: auto;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.req-accept {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.req-reject {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.req-admit {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.req-refer {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+/* Live popup */
+.hosp-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 16px;
+}
+
+.hosp-popup {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+.hosp-popup-title {
+  font-weight: 900;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.hosp-popup-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.hosp-popup-row:last-child {
+  border-bottom: none;
+}
+
+.hosp-popup-label {
+  opacity: 0.75;
+  font-weight: 800;
+}
+
+.hosp-popup-value {
+  font-weight: 900;
+  text-align: right;
+}
+
+.hosp-popup-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.hosp-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.topbar-logo-btn {
+  width: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.topbar-logo-btn:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.75);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+@media (max-width: 900px) {
+  .hosp-panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hosp-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hosp-pill {
+    display: none;
+  }
+}

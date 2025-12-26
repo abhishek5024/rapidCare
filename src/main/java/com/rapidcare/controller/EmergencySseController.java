@@ -38,4 +38,15 @@ public class EmergencySseController {
             }
         }
     }
+
+    public void notifyNewRequest(EmergencyRequest saved) {
+        // Broadcast to all currently connected clients (e.g., hospital dashboards)
+        emitters.forEach((key, emitter) -> {
+            try {
+                emitter.send(saved);
+            } catch (Exception ex) {
+                emitters.remove(key);
+            }
+        });
+    }
 }

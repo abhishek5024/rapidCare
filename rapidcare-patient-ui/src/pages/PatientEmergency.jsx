@@ -1,116 +1,136 @@
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import PatientTopBar from "../components/PatientTopBar";
+import PatientInfoCard from "../components/PatientInfoCard";
+import EmergencyForm from "../components/EmergencyForm";
+import { EmergencyResult } from "../components/EmergencyResult";
+import LiveStatusCard from "../components/LiveStatusCard";
 import { createEmergency } from "../api/emergencyApi";
+import "../styles/emergency.css";
 
-function PatientEmergency() {
-  const [patientName, setPatientName] = useState("");
-  const [symptoms, setSymptoms] = useState("");
-  const [response, setResponse] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+export default function PatientEmergency() {
+  const [request, setRequest] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState(null);
 
-  const getSeverityColor = (severity) => {
-    if (severity === "HIGH") return "red";
-    if (severity === "MEDIUM") return "orange";
-    return "green";
+  const statusRef = useRef(null);
+  const lastStatusRef = useRef(null);
+
+  const patient = useMemo(() => {
+    const name =
+      localStorage.getItem("name") || localStorage.getItem("patientName") || "Patient";
+    const phone = localStorage.getItem("phone") || "";
+    const patientId = localStorage.getItem("userId") || "";
+    return { name, phone, patientId };
+  }, []);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    window.setTimeout(() => setToast(null), 3200);
   };
 
-  const submitEmergency = async () => {
-    setLoading(true);
-    setError("");
-    setResponse(null);
-
+  const submitEmergency = async ({ symptoms, conscious, lat, lng }) => {
     try {
+      if (!symptoms || !symptoms.trim()) {
+        showToast("Please enter symptoms");
+        return;
+      }
+
+      setIsSubmitting(true);
+      setRequest(null);
+
       const res = await createEmergency({
-        patientName,
-        symptoms,
-        hospitalId: "HOSP001" // demo hospital
+        patientId: patient.patientId || undefined,
+        patientName: patient.name,
+        patientPhone: patient.phone || undefined,
+        symptoms: symptoms.trim(),
+        conscious,
+        lat,
+        lng,
       });
-      setResponse(res);
+
+      setRequest(res);
+      lastStatusRef.current = res?.status;
+      showToast("✅ Emergency request submitted. Notifying nearby hospitals...");
+
+      // auto-scroll to status section
+      setTimeout(() => {
+        statusRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
     } catch (err) {
-      console.error(err);
-      setError("Failed to submit emergency request");
+      showToast(err?.message || "Failed to submit emergency request");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
+  // Subscribe to server-sent events for live emergency updates
+  useEffect(() => {
+    if (!request?.id) return;
+
+    const eventSource = new EventSource(
+      `http://localhost:8081/api/stream/emergency/${request.id}`
+    );
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        setRequest(data);
+      } catch {
+        // ignore
+      }
+    };
+
+    eventSource.onerror = () => {
+      // Keep quiet; page should stay calm.
+    };
+
+    return () => eventSource.close();
+  }, [request?.id]);
+
+  // Auto-scroll on status changes
+  useEffect(() => {
+    const next = request?.status;
+    if (!next) return;
+
+    if (lastStatusRef.current && lastStatusRef.current !== next) {
+      setTimeout(() => {
+        statusRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 60);
+    }
+
+    lastStatusRef.current = next;
+  }, [request?.status]);
+
   return (
-    <div style={{ padding: "40px", maxWidth: "600px", margin: "auto" }}>
-      <h2>🚑 Emergency Request</h2>
+    <div className="em-page">
+      <PatientTopBar />
 
-      <input
-        type="text"
-        placeholder="Patient Name"
-        value={patientName}
-        onChange={(e) => setPatientName(e.target.value)}
-        style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
-      />
+      <header className="em-hero">
+        <div className="em-hero-title">🚑 Emergency Medical Assistance</div>
+        <div className="em-hero-subtitle">
+          AI-powered triage | Nearby hospitals notified instantly
+        </div>
+      </header>
 
-      <textarea
-        placeholder="Describe symptoms (e.g. chest pain, sweating)"
-        value={symptoms}
-        onChange={(e) => setSymptoms(e.target.value)}
-        style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
-      />
+      <main className="em-container">
+        <div className="em-grid">
+          <div className="em-col">
+            <PatientInfoCard />
+            <EmergencyForm onSubmit={submitEmergency} isSubmitting={isSubmitting} />
+          </div>
 
-      <button onClick={submitEmergency} disabled={loading}>
-        {loading ? "Submitting..." : "Submit Emergency"}
-      </button>
+          <div className="em-col" ref={statusRef}>
+            <EmergencyResult response={request} />
+            <LiveStatusCard request={request} />
+          </div>
+        </div>
+      </main>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {response && (
-        <div style={{ marginTop: "20px", padding: "15px", border: "1px solid #ccc" }}>
-          <h3>📊 AI Assessment Result</h3>
-
-          <p>
-            <b>Severity:</b>{" "}
-            <span
-              style={{
-                color: getSeverityColor(response.severity),
-                fontWeight: "bold"
-              }}
-            >
-              {response.severity}
-            </span>
-          </p>
-
-          <p><b>Status:</b> {response.status}</p>
-          <p><b>Hospital:</b> {response.hospitalId}</p>
-
-          {response.aiEntities && response.aiEntities.length > 0 && (
-            <>
-              <p><b>Detected Symptoms (AI):</b></p>
-              <ul>
-                {response.aiEntities.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          {response.aiReasons && response.aiReasons.length > 0 && (
-            <>
-              <p><b>AI Reasoning:</b></p>
-              <ul>
-                {response.aiReasons.map((reason, index) => (
-                  <li key={index}>{reason}</li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          <p style={{ marginTop: "10px", color: "green", fontWeight: "bold" }}>
-            ✅ Emergency request sent to hospital successfully
-          </p>
-
-          <p style={{ fontSize: "12px", color: "#555" }}>
-            Medical entities and severity are extracted using Azure AI Language – Healthcare Text Analytics.
-          </p>
+      {toast && (
+        <div className="em-toast" role="alert" aria-live="polite">
+          {toast}
         </div>
       )}
     </div>
   );
 }
-
-export default PatientEmergency;

@@ -1,54 +1,43 @@
-function getSeverityColor(severity) {
-  if (severity === "HIGH") return "red";
-  if (severity === "MEDIUM") return "orange";
-  return "green";
+import "../styles/emergency.css";
+
+function getSeverityClass(severity) {
+  const s = String(severity || "").toUpperCase();
+  if (s === "HIGH") return "severity-high";
+  if (s === "MEDIUM") return "severity-medium";
+  return "severity-low";
 }
 
 export function EmergencyResult({ response }) {
   if (!response) return null;
 
   return (
-    <div className="result-card">
-      <h3>📊 AI Assessment</h3>
+    <section className="em-card" aria-label="AI medical assessment">
+      <div className="em-card-title">🤖 AI Medical Assessment</div>
 
-      {/* Severity */}
-      <p>
-        <strong>Severity:</strong>{" "}
-        <span style={{ color: getSeverityColor(response.severity), fontWeight: "bold" }}>
-          {response.severity}
-        </span>
-      </p>
+      <div className="em-kv">
+        <div className="em-k">Severity</div>
+        <div className={`em-v ${getSeverityClass(response.severity)}`}>{response.severity}</div>
+      </div>
 
-      {/* Extracted Symptoms */}
       {response.aiEntities?.length > 0 && (
-        <>
-          <p><strong>Detected Symptoms:</strong></p>
+        <div className="em-list">
+          <div className="em-subtitle">Detected Symptoms</div>
           <ul>
             {response.aiEntities.map((s, i) => (
               <li key={i}>{s}</li>
             ))}
           </ul>
-        </>
+        </div>
       )}
 
-      {/* AI Reasoning */}
-      {response.aiReasons?.length > 0 && (
-        <>
-          <p><strong>AI Reasoning:</strong></p>
-          <ul>
-            {response.aiReasons.map((r, i) => (
-              <li key={i}>{r}</li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      {/* Status */}
-      <div className="status-box">
-        ✅ <strong>Request sent to hospital</strong>
-        <br />
-        Current status: <b>{response.status}</b>
+      <div className="em-status-row">
+        <span className="em-status-icon">📡</span>
+        <span className="em-status-text">Request sent to nearby hospitals</span>
       </div>
-    </div>
+
+      <div className="em-muted">
+        Medical entities and severity are extracted using Azure AI Language – Healthcare Text Analytics.
+      </div>
+    </section>
   );
 }

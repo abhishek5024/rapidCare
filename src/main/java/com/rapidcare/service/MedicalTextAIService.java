@@ -20,7 +20,7 @@ public class MedicalTextAIService {
     @Autowired
     private TextAnalyticsClient client;
 
-    public Map<String, Object> analyzeSymptoms(String text) {
+    public Map<String, Object> analyzeMedicalText(String text) {
 
         AnalyzeHealthcareEntitiesResultCollection results =
                 client.beginAnalyzeHealthcareEntities(
@@ -67,11 +67,11 @@ public class MedicalTextAIService {
             reasons.add("No critical medical entities detected by AI");
         }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("severity", severity);
-        response.put("reasons", reasons);
-        response.put("entities", detectedEntities);
+        Map<String, Object> result = new HashMap<>();
+        result.put("severity", severity);
+        result.put("entities", detectedEntities);
+        result.put("reasons", reasons);
 
-        return response;
+        return result;
     }
 }

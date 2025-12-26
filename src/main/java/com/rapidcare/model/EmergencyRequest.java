@@ -19,12 +19,26 @@ public class EmergencyRequest {
     private String severity;
     private String status; // PENDING, ACCEPTED, REJECTED, PREPARING
 
-    private String hospitalId;
-    private Instant createdAt = Instant.now();
-    private List<String> aiReasons;
-    private List<String> aiEntities;
-    private String hospitalAddress;
+    /**
+     * Cosmos Mongo sharding requires the shard key to be present on every write.
+     * Keep this set for the lifetime of the document.
+     * For "broadcast" requests, use a constant value like "BROADCAST".
+     */
+    private String hospitalId; // ALWAYS "BROADCAST"
+
+    // ✅ ACCEPTED BY
+    private String acceptedHospitalId;
+    private String acceptedHospitalName;
+    private String acceptedHospitalAddress;
+
+    // ❌ REJECTION
     private String rejectionReason;
+
+    private List<String> aiEntities;
+    private List<String> aiReasons;
+
+    private Instant createdAt = Instant.now();
+
 
 
     // public void setHospitalAddress(String string) {

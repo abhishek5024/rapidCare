@@ -2,15 +2,7 @@ package com.rapidcare.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.rapidcare.model.EmergencyRequest;
 import com.rapidcare.service.EmergencyService;
@@ -20,53 +12,67 @@ import com.rapidcare.service.EmergencyService;
 @CrossOrigin(origins = "http://localhost:5173")
 public class EmergencyController {
 
-    @Autowired
-    private EmergencyService service;
+    private final EmergencyService service;
+
+    public EmergencyController(EmergencyService service) {
+        this.service = service;
+    }
+
+    /* ========= PATIENT ========= */
 
     @PostMapping("/request")
     public EmergencyRequest create(@RequestBody EmergencyRequest request) {
         return service.create(request);
     }
-    @GetMapping("/hospital/{hospitalId}")
-    public List<EmergencyRequest> getByHospital(@PathVariable String hospitalId) {
-        return service.getByHospitalId(hospitalId);
-    }
 
-    @PutMapping("/{id}/accept")
-    public EmergencyRequest accept(@PathVariable String id) {
-        return service.accept(id);
-    }
-
-    @PutMapping("/{id}/reject")
-    public EmergencyRequest reject(@PathVariable String id) {
-        return service.reject(id);
+    @GetMapping("/{id}")
+    public EmergencyRequest getById(@PathVariable String id) {
+        return service.getById(id)
+                .orElseThrow(() -> new RuntimeException("Not found"));
     }
 
     @GetMapping("/all")
     public List<EmergencyRequest> getAll() {
         return service.getAll();
     }
-    @PutMapping("/{id}/refer/{newHospitalId}")
-public EmergencyRequest refer(
-        @PathVariable String id,
-        @PathVariable String newHospitalId) {
-    return service.refer(id, newHospitalId);
-}
+
+    /* ========= HOSPITAL ========= */
+
+    @GetMapping("/hospital/{hospitalId}")
+    public List<EmergencyRequest> getForHospital(
+            @PathVariable String hospitalId) {
+        return service.getForHospital(hospitalId);
+    }
+
+    @PutMapping("/{id}/accept")
+    public EmergencyRequest accept(
+            @PathVariable String id,
+            @RequestParam String hospitalId,
+            @RequestParam String hospitalName) {
+
+        return service.accept(id, hospitalId, hospitalName);
+    }
+
+    @PutMapping("/{id}/reject")
+    public EmergencyRequest reject(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "No beds available") String reason) {
+
+        return service.reject(id, reason);
+    }
 
     @PutMapping("/{id}/in-transit")
-public EmergencyRequest inTransit(@PathVariable String id) {
-    return service.inTransit(id);
-}
+    public EmergencyRequest inTransit(@PathVariable String id) {
+        return service.inTransit(id);
+    }
 
-@PutMapping("/{id}/admit")
-public EmergencyRequest admit(@PathVariable String id) {
-    return service.admit(id);
-}
+    @PutMapping("/{id}/admit")
+    public EmergencyRequest admit(@PathVariable String id) {
+        return service.admit(id);
+    }
 
-
-    @GetMapping("/{id}")
-    public EmergencyRequest getById(@PathVariable String id) {
-        return service.getById(id)
-                .orElseThrow(() -> new RuntimeException("Not found"));
+    @PutMapping("/{id}/refer")
+    public EmergencyRequest refer(@PathVariable String id) {
+        return service.refer(id);
     }
 }

@@ -1,0 +1,196 @@
+/* Split auth layout (RapidCare final design) */
+.auth-split {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  background: #0b1220;
+}
+
+.auth-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: #ffffff;
+  background: radial-gradient(1200px 700px at 20% 20%, rgba(59, 130, 246, 0.30), transparent 60%),
+    radial-gradient(900px 600px at 70% 60%, rgba(34, 197, 94, 0.22), transparent 55%),
+    linear-gradient(135deg, #0b1220 0%, #0f1a33 100%);
+}
+
+.auth-left-inner {
+  width: 100%;
+  max-width: 520px;
+}
+
+.auth-brand {
+  font-size: 52px;
+  font-weight: 1000;
+  letter-spacing: 0.3px;
+  line-height: 1.02;
+}
+
+.auth-tagline {
+  margin-top: 14px;
+  font-size: 18px;
+  font-weight: 700;
+  opacity: 0.92;
+  line-height: 1.35;
+}
+
+.auth-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: #f3f6fb;
+}
+
+.auth-label {
+  display: block;
+  margin: 10px 0 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.auth-error {
+  margin-top: 10px;
+  color: #b91c1c;
+  font-weight: 800;
+}
+
+.auth-footer {
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* Make the existing card look consistent on the new right panel */
+.auth-card {
+  width: 100%;
+  margin: 0;
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.auth-card button {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 180ms ease;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.22);
+}
+
+.auth-card button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 16px 40px rgba(37, 99, 235, 0.28);
+}
+
+.auth-card button:active {
+  transform: translateY(0px);
+  filter: brightness(0.99);
+}
+
+.auth-card button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Input with icon (lock) */
+.auth-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.auth-input-with-icon {
+  padding-left: 38px !important;
+}
+
+/* Spinner */
+.auth-btn-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.auth-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-top-color: #ffffff;
+  animation: auth-spin 0.8s linear infinite;
+}
+
+@keyframes auth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Toast */
+.auth-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 999;
+  max-width: 360px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(185, 28, 28, 0.95);
+  color: #ffffff;
+  font-weight: 900;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .auth-split {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-left {
+    padding: 36px 22px;
+  }
+
+  .auth-brand {
+    font-size: 42px;
+  }
+}
