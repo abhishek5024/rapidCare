@@ -31,6 +31,17 @@ public class EmergencyRequest {
     private String acceptedHospitalName;
     private String acceptedHospitalAddress;
 
+    // 📍 Live Tracking (patient + hospital + ambulance)
+    // All optional and primarily for demo purposes.
+    private Double patientLat;
+    private Double patientLng;
+
+    private Double hospitalLat;
+    private Double hospitalLng;
+
+    private Double ambulanceLat;
+    private Double ambulanceLng;
+
     // ❌ REJECTION
     private String rejectionReason;
 

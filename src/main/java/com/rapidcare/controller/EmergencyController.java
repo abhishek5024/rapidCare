@@ -75,4 +75,14 @@ public class EmergencyController {
     public EmergencyRequest refer(@PathVariable String id) {
         return service.refer(id);
     }
+
+    @PutMapping("/{id}/arriving")
+    public EmergencyRequest arriving(@PathVariable String id) {
+        return service.arriving(id);
+    }
+
+    @PutMapping("/{id}/picked-up")
+    public EmergencyRequest pickedUp(@PathVariable String id) {
+        return service.pickedUp(id);
+    }
 }

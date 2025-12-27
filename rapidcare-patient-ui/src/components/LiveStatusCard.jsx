@@ -10,6 +10,8 @@ function labelForStatus(req) {
       return `✅ Accepted by ${req.acceptedHospitalName || "Hospital"}`;
     case "IN_TRANSIT":
       return "🚑 Ambulance on the way";
+    case "ARRIVING":
+      return "📍 Ambulance arriving shortly";
     case "ADMITTED":
       return "✅ Patient admitted";
     case "REJECTED":

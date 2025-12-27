@@ -17,6 +17,10 @@ public class EmergencyService {
 
     private static final String BROADCAST_HOSPITAL_ID = "BROADCAST";
 
+    // Demo defaults (Patna-like coordinates). Can be overridden by patient-provided lat/lng.
+    private static final double DEFAULT_HOSPITAL_LAT = 25.5941;
+    private static final double DEFAULT_HOSPITAL_LNG = 85.1376;
+
     private final EmergencyRequestRepository repository;
     private final MedicalTextAIService aiService;
     private final EmergencySseController sseController;
@@ -155,7 +159,37 @@ public class EmergencyService {
             req.setHospitalId(BROADCAST_HOSPITAL_ID);
         }
 
+        // Hospital coordinates (seed if missing)
+        if (req.getHospitalLat() == null) req.setHospitalLat(DEFAULT_HOSPITAL_LAT);
+        if (req.getHospitalLng() == null) req.setHospitalLng(DEFAULT_HOSPITAL_LNG);
+
+        // If patient location is missing, seed a mock location near the hospital.
+        if (req.getPatientLat() == null) req.setPatientLat(DEFAULT_HOSPITAL_LAT + 0.0079);
+        if (req.getPatientLng() == null) req.setPatientLng(DEFAULT_HOSPITAL_LNG - 0.0126);
+
+        // Start ambulance at hospital.
+        if (req.getAmbulanceLat() == null) req.setAmbulanceLat(req.getHospitalLat());
+        if (req.getAmbulanceLng() == null) req.setAmbulanceLng(req.getHospitalLng());
+
         req.setStatus(RequestStatus.IN_TRANSIT.name());
+
+        EmergencyRequest saved = repository.save(req);
+        sseController.notifyStatus(requestId, saved);
+        return saved;
+    }
+
+    /* =========================
+       ARRIVING
+    ========================= */
+    public EmergencyRequest arriving(String requestId) {
+        EmergencyRequest req = repository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        if (req.getHospitalId() == null || req.getHospitalId().isBlank()) {
+            req.setHospitalId(BROADCAST_HOSPITAL_ID);
+        }
+
+        req.setStatus(RequestStatus.ARRIVING.name());
 
         EmergencyRequest saved = repository.save(req);
         sseController.notifyStatus(requestId, saved);
@@ -199,6 +233,29 @@ public class EmergencyService {
         EmergencyRequest saved = repository.save(req);
         sseController.notifyNewRequest(saved);
 
+        return saved;
+    }
+
+    /* =========================
+       PICKED UP (PATIENT CONFIRMS)
+    ========================= */
+    public EmergencyRequest pickedUp(String requestId) {
+        EmergencyRequest req = repository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        if (req.getHospitalId() == null || req.getHospitalId().isBlank()) {
+            req.setHospitalId(BROADCAST_HOSPITAL_ID);
+        }
+
+        // Ensure hospital coords exist for return trip
+        if (req.getHospitalLat() == null) req.setHospitalLat(DEFAULT_HOSPITAL_LAT);
+        if (req.getHospitalLng() == null) req.setHospitalLng(DEFAULT_HOSPITAL_LNG);
+
+        // If ambulance is already near patient, keep it; otherwise leave as-is.
+        req.setStatus(RequestStatus.PICKED_UP.name());
+
+        EmergencyRequest saved = repository.save(req);
+        sseController.notifyStatus(requestId, saved);
         return saved;
     }
 }

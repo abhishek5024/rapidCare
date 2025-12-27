@@ -4,7 +4,8 @@ import {
   acceptRequest,
   rejectRequest,
   admitRequest,
-  referRequest
+  referRequest,
+  inTransitRequest,
 } from "../api/emergencyApi";
 import HospitalTopBar from "../components/HospitalTopBar";
 import "../styles/hospitalDashboard.css";
@@ -67,6 +68,8 @@ export default function HospitalDashboard() {
         await acceptRequest(id, hospitalId, hospitalName);
       } else if (action === "reject") {
         await rejectRequest(id);
+      } else if (action === "in_transit") {
+        await inTransitRequest(id);
       } else if (action === "admit") {
         await admitRequest(id);
       } else if (action === "refer") {
@@ -209,6 +212,7 @@ export default function HospitalDashboard() {
                   <div className="req-symptoms">{summarizeSymptoms(req.symptoms)}</div>
 
                   <div className="req-actions">
+                    <button className="req-btn req-admit" type="button" onClick={() => handleAction(req.id, "in_transit")}>🚑 In Transit</button>
                     <button className="req-btn req-admit" type="button" onClick={() => handleAction(req.id, "admit")}>🏥 Admit</button>
                     <button className="req-btn req-refer" type="button" onClick={() => handleAction(req.id, "refer")}>🔁 Refer</button>
                   </div>

@@ -5,6 +5,8 @@ public enum RequestStatus {
     ACCEPTED,
     REJECTED,
     IN_TRANSIT,
+    ARRIVING,
+    PICKED_UP,
     ADMITTED,
     CANCELLED
 }

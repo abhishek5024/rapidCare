@@ -63,3 +63,27 @@ export async function referRequest(requestId) {
   if (!res.ok) throw new Error("Refer failed");
   return res.json();
 }
+
+export async function inTransitRequest(requestId) {
+  const res = await fetch(`${BASE_URL}/${requestId}/in-transit`, {
+    method: "PUT",
+  });
+  if (!res.ok) throw new Error("In-transit failed");
+  return res.json();
+}
+
+export async function arrivingRequest(requestId) {
+  const res = await fetch(`${BASE_URL}/${requestId}/arriving`, {
+    method: "PUT",
+  });
+  if (!res.ok) throw new Error("Arriving failed");
+  return res.json();
+}
+
+export async function pickedUpRequest(requestId) {
+  const res = await fetch(`${BASE_URL}/${requestId}/picked-up`, {
+    method: "PUT",
+  });
+  if (!res.ok) throw new Error("Picked-up failed");
+  return res.json();
+}

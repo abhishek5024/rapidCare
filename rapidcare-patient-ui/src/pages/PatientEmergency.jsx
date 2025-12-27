@@ -4,7 +4,8 @@ import PatientInfoCard from "../components/PatientInfoCard";
 import EmergencyForm from "../components/EmergencyForm";
 import { EmergencyResult } from "../components/EmergencyResult";
 import LiveStatusCard from "../components/LiveStatusCard";
-import { createEmergency } from "../api/emergencyApi";
+import AmbulanceMap from "../components/AmbulanceMap";
+import { createEmergency, pickedUpRequest } from "../api/emergencyApi";
 import "../styles/emergency.css";
 
 export default function PatientEmergency() {
@@ -101,6 +102,24 @@ export default function PatientEmergency() {
     lastStatusRef.current = next;
   }, [request?.status]);
 
+  const onSimulatedAmbulanceUpdate = (patch) => {
+    setRequest((prev) => {
+      if (!prev) return prev;
+      return { ...prev, ...patch };
+    });
+  };
+
+  const confirmPickedUp = async () => {
+    try {
+      if (!request?.id) return;
+      const updated = await pickedUpRequest(request.id);
+      setRequest(updated);
+      showToast("✅ Confirmed. Heading to hospital now...");
+    } catch (err) {
+      showToast(err?.message || "Failed to confirm pickup");
+    }
+  };
+
   return (
     <div className="em-page">
       <PatientTopBar />
@@ -122,6 +141,11 @@ export default function PatientEmergency() {
           <div className="em-col" ref={statusRef}>
             <EmergencyResult response={request} />
             <LiveStatusCard request={request} />
+            <AmbulanceMap
+              request={request}
+              onSimulatedUpdate={onSimulatedAmbulanceUpdate}
+              onConfirmPickedUp={confirmPickedUp}
+            />
           </div>
         </div>
       </main>
