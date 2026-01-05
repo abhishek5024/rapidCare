@@ -47,7 +47,11 @@ export default function HospitalDashboard() {
     const fetchData = async () => {
       try {
         const data = await getHospitalRequests(hospitalId);
-        if (active) setRequests(Array.isArray(data) ? data : []);
+        if (active) {
+          const arr = Array.isArray(data) ? data : [];
+          console.log("HOSPITAL REQUESTS RAW:", arr);
+          setRequests(arr);
+        }
       } catch (err) {
         console.error("Failed to load requests", err);
       }
@@ -78,7 +82,9 @@ export default function HospitalDashboard() {
 
       // refresh quickly after an action
       const data = await getHospitalRequests(hospitalId);
-      setRequests(Array.isArray(data) ? data : []);
+      const arr = Array.isArray(data) ? data : [];
+      console.log("HOSPITAL REQUESTS RAW (after action):", arr);
+      setRequests(arr);
     } catch (err) {
       console.error("Action failed:", err);
     }
@@ -86,8 +92,11 @@ export default function HospitalDashboard() {
 
   const pending = requests.filter(r => r.status === "PENDING");
   const accepted = requests.filter(r => r.status === "ACCEPTED");
+  const inTransit = requests.filter(r => r.status === "IN_TRANSIT");
   const admitted = requests.filter(r => r.status === "ADMITTED");
-  const referred = requests.filter(r => r.status === "PENDING" && r.acceptedHospitalId == null);
+  const referred = requests.filter(
+    r => r.status === "PENDING" && r.acceptedHospitalId == null
+  );
 
   // Live popup = newest pending (basic)
   const liveRequest = pending[0] || null;
@@ -117,12 +126,18 @@ export default function HospitalDashboard() {
               <div className="hosp-panel-value">{accepted.length}</div>
             </div>
             <div className="hosp-panel">
+              <div className="hosp-panel-title">🚑 In Transit</div>
+              <div className="hosp-panel-value">{inTransit.length}</div>
+            </div>
+            <div className="hosp-panel">
               <div className="hosp-panel-title">🏥 Admitted</div>
               <div className="hosp-panel-value">{admitted.length}</div>
             </div>
             <div className="hosp-panel">
               <div className="hosp-panel-title">🔁 Referred</div>
-              <div className="hosp-panel-value">{Math.max(0, referred.length - pending.length)}</div>
+              <div className="hosp-panel-value">
+                {Math.max(0, referred.length - pending.length)}
+              </div>
             </div>
           </div>
 
@@ -134,7 +149,9 @@ export default function HospitalDashboard() {
 
                 <div className="hosp-popup-row">
                   <div className="hosp-popup-label">Patient Name</div>
-                  <div className="hosp-popup-value">{liveRequest.patientName || "—"}</div>
+                  <div className="hosp-popup-value">
+                    {liveRequest.patientName || "—"}
+                  </div>
                 </div>
 
                 <div className="hosp-popup-row">
@@ -148,7 +165,9 @@ export default function HospitalDashboard() {
 
                 <div className="hosp-popup-row">
                   <div className="hosp-popup-label">Symptoms</div>
-                  <div className="hosp-popup-value">{summarizeSymptoms(liveRequest.symptoms) || "—"}</div>
+                  <div className="hosp-popup-value">
+                    {summarizeSymptoms(liveRequest.symptoms) || "—"}
+                  </div>
                 </div>
 
                 <div className="hosp-popup-actions">
@@ -173,78 +192,182 @@ export default function HospitalDashboard() {
 
           {/* Request Cards */}
           <div className="hosp-grid">
+            {/* Pending */}
             <section className="hosp-section">
               <h3 className="hosp-section-title">🕒 Pending</h3>
               {pending.length === 0 && <div>No pending requests.</div>}
               {pending.map(req => (
                 <div key={req.id} className="req-card">
                   <div className="req-head">
-                    <div className="req-patient">👤 {req.patientName || "Patient"}</div>
+                    <div className="req-patient">
+                      👤 {req.patientName || "Patient"}
+                    </div>
                     <div className="req-meta">
-                      <span className={getSeverityUi(req.severity).cls}>{getSeverityUi(req.severity).text}</span>
-                      <span className="req-time">{formatTime(req.createdAt)}</span>
+                      <span className={getSeverityUi(req.severity).cls}>
+                        {getSeverityUi(req.severity).text}
+                      </span>
+                      <span className="req-time">
+                        {formatTime(req.createdAt)}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="req-symptoms">{summarizeSymptoms(req.symptoms)}</div>
+                  <div className="req-symptoms">
+                    {summarizeSymptoms(req.symptoms)}
+                  </div>
 
                   <div className="req-actions">
-                    <button className="req-btn req-accept" type="button" onClick={() => handleAction(req.id, "accept")}>✅ Accept</button>
-                    <button className="req-btn req-reject" type="button" onClick={() => handleAction(req.id, "reject")}>❌ Reject</button>
+                    <button
+                      className="req-btn req-accept"
+                      type="button"
+                      onClick={() => handleAction(req.id, "accept")}
+                    >
+                      ✅ Accept
+                    </button>
+                    <button
+                      className="req-btn req-reject"
+                      type="button"
+                      onClick={() => handleAction(req.id, "reject")}
+                    >
+                      ❌ Reject
+                    </button>
                   </div>
                 </div>
               ))}
             </section>
 
+            {/* Accepted */}
             <section className="hosp-section">
               <h3 className="hosp-section-title">🟢 Accepted</h3>
               {accepted.length === 0 && <div>No accepted requests.</div>}
               {accepted.map(req => (
                 <div key={req.id} className="req-card">
                   <div className="req-head">
-                    <div className="req-patient">👤 {req.patientName || "Patient"}</div>
+                    <div className="req-patient">
+                      👤 {req.patientName || "Patient"}
+                    </div>
                     <div className="req-meta">
-                      <span className={getSeverityUi(req.severity).cls}>{getSeverityUi(req.severity).text}</span>
-                      <span className="req-time">{formatTime(req.createdAt)}</span>
+                      <span className={getSeverityUi(req.severity).cls}>
+                        {getSeverityUi(req.severity).text}
+                      </span>
+                      <span className="req-time">
+                        {formatTime(req.createdAt)}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="req-symptoms">{summarizeSymptoms(req.symptoms)}</div>
+                  <div className="req-symptoms">
+                    {summarizeSymptoms(req.symptoms)}
+                  </div>
 
                   <div className="req-actions">
-                    <button className="req-btn req-admit" type="button" onClick={() => handleAction(req.id, "in_transit")}>🚑 In Transit</button>
-                    <button className="req-btn req-admit" type="button" onClick={() => handleAction(req.id, "admit")}>🏥 Admit</button>
-                    <button className="req-btn req-refer" type="button" onClick={() => handleAction(req.id, "refer")}>🔁 Refer</button>
+                    <button
+                      className="req-btn req-admit"
+                      type="button"
+                      onClick={() => handleAction(req.id, "in_transit")}
+                    >
+                      🚑 In Transit
+                    </button>
+                    <button
+                      className="req-btn req-admit"
+                      type="button"
+                      onClick={() => handleAction(req.id, "admit")}
+                    >
+                      🏥 Admit
+                    </button>
+                    <button
+                      className="req-btn req-refer"
+                      type="button"
+                      onClick={() => handleAction(req.id, "refer")}
+                    >
+                      🔁 Refer
+                    </button>
                   </div>
                 </div>
               ))}
             </section>
 
+            {/* In Transit */}
+            <section className="hosp-section">
+              <h3 className="hosp-section-title">🚑 In Transit</h3>
+              {inTransit.length === 0 && <div>No in-transit requests.</div>}
+              {inTransit.map(req => (
+                <div key={req.id} className="req-card">
+                  <div className="req-head">
+                    <div className="req-patient">
+                      👤 {req.patientName || "Patient"}
+                    </div>
+                    <div className="req-meta">
+                      <span className={getSeverityUi(req.severity).cls}>
+                        {getSeverityUi(req.severity).text}
+                      </span>
+                      <span className="req-time">
+                        {formatTime(req.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="req-symptoms">
+                    {summarizeSymptoms(req.symptoms)}
+                  </div>
+
+                  <div className="req-actions">
+                    <button
+                      className="req-btn req-admit"
+                      type="button"
+                      onClick={() => handleAction(req.id, "admit")}
+                    >
+                      🏥 Admit
+                    </button>
+                    <button
+                      className="req-btn req-refer"
+                      type="button"
+                      onClick={() => handleAction(req.id, "refer")}
+                    >
+                      🔁 Refer
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </section>
+
+            {/* Admitted */}
             <section className="hosp-section">
               <h3 className="hosp-section-title">🏥 Admitted</h3>
               {admitted.length === 0 && <div>No admitted requests.</div>}
               {admitted.map(req => (
                 <div key={req.id} className="req-card">
                   <div className="req-head">
-                    <div className="req-patient">👤 {req.patientName || "Patient"}</div>
+                    <div className="req-patient">
+                      👤 {req.patientName || "Patient"}
+                    </div>
                     <div className="req-meta">
-                      <span className={getSeverityUi(req.severity).cls}>{getSeverityUi(req.severity).text}</span>
-                      <span className="req-time">{formatTime(req.createdAt)}</span>
+                      <span className={getSeverityUi(req.severity).cls}>
+                        {getSeverityUi(req.severity).text}
+                      </span>
+                      <span className="req-time">
+                        {formatTime(req.createdAt)}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="req-symptoms">{summarizeSymptoms(req.symptoms)}</div>
+                  <div className="req-symptoms">
+                    {summarizeSymptoms(req.symptoms)}
+                  </div>
                 </div>
               ))}
             </section>
 
+            {/* Referred */}
             <section className="hosp-section">
               <h3 className="hosp-section-title">🔁 Referred</h3>
-              <div>Referred requests will reappear as Pending (broadcast) in the system.</div>
+              <div>
+                Referred requests will reappear as Pending (broadcast) in the system.
+              </div>
             </section>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
+              </div>
+            )}
+          </div>
+        );
+      }
