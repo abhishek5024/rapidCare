@@ -2,7 +2,16 @@ package com.rapidcare.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.rapidcare.model.EmergencyRequest;
 import com.rapidcare.service.EmergencyService;
@@ -25,6 +34,15 @@ public class EmergencyController {
         return service.create(request);
     }
 
+    // NEW: latest emergency for a patient (used by getMyLatestEmergency in frontend)
+    @GetMapping("/patient/{patientId}/latest")
+public ResponseEntity<EmergencyRequest> getLatestForPatient(@PathVariable String patientId) {
+    return service.getLatestForPatient(patientId)
+            .map(ResponseEntity::ok)
+            // when none exists, return 200 with null body
+            .orElseGet(() -> ResponseEntity.ok(null));
+}
+
     @GetMapping("/{id}")
     public EmergencyRequest getById(@PathVariable String id) {
         return service.getById(id)
@@ -39,8 +57,7 @@ public class EmergencyController {
     /* ========= HOSPITAL ========= */
 
     @GetMapping("/hospital/{hospitalId}")
-    public List<EmergencyRequest> getForHospital(
-            @PathVariable String hospitalId) {
+    public List<EmergencyRequest> getForHospital(@PathVariable String hospitalId) {
         return service.getForHospital(hospitalId);
     }
 
@@ -71,10 +88,13 @@ public class EmergencyController {
         return service.admit(id);
     }
 
-    @PutMapping("/{id}/refer")
-    public EmergencyRequest refer(@PathVariable String id) {
-        return service.refer(id);
-    }
+   @PutMapping("/{id}/refer")
+public EmergencyRequest refer(
+        @PathVariable String id,
+        @RequestParam String hospitalId
+) {
+    return service.refer(id, hospitalId);
+}
 
     @PutMapping("/{id}/arriving")
     public EmergencyRequest arriving(@PathVariable String id) {
